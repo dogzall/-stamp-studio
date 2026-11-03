@@ -39,7 +39,7 @@ function worker({ failInstall = false, offline = false } = {}) {
   vm.runInNewContext(read('sw.js'), {
     self, URL, Request, caches: {
       open: async () => cache,
-      keys: async () => [version, 'stamp-studio-v1.0.0', 'stamp-studio-v1.0.1', 'amekaji-studio-v1'],
+      keys: async () => [version, 'stamp-studio-v1.0.0', 'stamp-studio-v1.0.1', 'stamp-studio-v1.0.2', 'amekaji-studio-v1'],
       delete: async name => { removed.push(name); }
     },
     fetch: async request => { fetched.push(request); if (offline) throw new Error('offline'); return new Response('network'); }
@@ -117,7 +117,7 @@ test('Failed install preserves active cache and reports error only to STAMP clie
 });
 test('Activation cleans only old STAMP caches; explicit message activates update', async () => {
   const sw = worker(); await sw.run('activate');
-  assert.deepEqual(sw.removed, ['stamp-studio-v1.0.0', 'stamp-studio-v1.0.1']);
+  assert.deepEqual(sw.removed, ['stamp-studio-v1.0.0', 'stamp-studio-v1.0.1', 'stamp-studio-v1.0.2']);
   await sw.run('message', { data: { type: 'SKIP_WAITING' } });
   assert.deepEqual(sw.messages, ['claim', 'skipWaiting']);
 });

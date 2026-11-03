@@ -1,1 +1,33 @@
-{"id":"./","name":"STAMP STUDIO","short_name":"STAMP","lang":"ja","description":"端末内でつくるLINEスタンプ制作ツール","start_url":"./","scope":"./","display":"standalone","orientation":"portrait-primary","theme_color":"#111827","background_color":"#111827","icons":[{"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"./icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
+{
+  "id": "/-stamp-studio/",
+  "name": "STAMP STUDIO",
+  "short_name": "STAMP",
+  "lang": "ja",
+  "description": "端末内でつくるLINEスタンプ制作ツール",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#111827",
+  "background_color": "#111827",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

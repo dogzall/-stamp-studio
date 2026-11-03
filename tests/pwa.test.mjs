@@ -39,7 +39,7 @@ function worker({ failInstall = false, offline = false } = {}) {
   vm.runInNewContext(read('sw.js'), {
     self, URL, Request, caches: {
       open: async () => cache,
-      keys: async () => [version, 'stamp-studio-v1.0.0', 'amekaji-studio-v1'],
+      keys: async () => [version, 'stamp-studio-v1.0.0', 'stamp-studio-v1.0.1', 'amekaji-studio-v1'],
       delete: async name => { removed.push(name); }
     },
     fetch: async request => { fetched.push(request); if (offline) throw new Error('offline'); return new Response('network'); }
@@ -56,10 +56,42 @@ test('Manifest resolves to the correct Pages subpath and standalone identity', (
   assert.equal(manifest.name, 'STAMP STUDIO');
   assert.equal(manifest.short_name, 'STAMP');
   assert.equal(manifest.display, 'standalone');
-  for (const key of ['id', 'start_url', 'scope']) assert.equal(new URL(manifest[key], base + 'manifest.json').href, base);
+  for (const key of ['start_url', 'scope']) assert.equal(new URL(manifest[key], base + 'manifest.json').href, base);
   assert.notEqual(manifest.prefer_related_applications, true);
   assert.equal(manifest.theme_color, '#111827');
   assert.match(read('index.html'), /rel="manifest" href="\.\/manifest\.json"/);
+});
+// Exercise the same URL resolution used in the diagnostics, with the browser-free
+// window shim. In particular, never resolve id against the manifest URL.
+function identity(json, url = base + 'manifest.json') {
+  const context = vm.createContext({ URL, Set, window: { addEventListener() {} } });
+  vm.runInContext(read('pwa.js').replaceAll('export ', ''), context);
+  return context.resolveManifestIdentity(json, url);
+}
+test('STAMP id resolves against start origin to its own subdirectory, not the origin root', () => {
+  const resolved = identity(manifest);
+  assert.equal(manifest.id, '/-stamp-studio/');
+  assert.equal(resolved.id.href, base);
+  assert.notEqual(resolved.id.href, new URL(base).origin + '/');
+});
+test('Regression: legacy id ./ resolves to origin root while start_url/scope stay in the app', () => {
+  const resolved = identity({ ...manifest, id: './' });
+  assert.equal(resolved.id.href, 'https://dogzall.github.io/');
+  assert.equal(resolved.start.href, base);
+  assert.equal(resolved.scope.href, base);
+});
+test('STAMP id differs from current AMEKAJI id on the same origin', () => {
+  // Read-only comparison: AMEKAJI main declares /amekaji-studio/.
+  const amekaji = identity({ id: '/amekaji-studio/', start_url: '/amekaji-studio/', scope: '/amekaji-studio/' },
+    'https://dogzall.github.io/amekaji-studio/manifest.webmanifest');
+  assert.equal(amekaji.id.href, 'https://dogzall.github.io/amekaji-studio/');
+  assert.notEqual(identity(manifest).id.href, amekaji.id.href);
+});
+test('Invalid/cross-origin/missing id fallback and fragment processing follow the spec', () => {
+  for (const value of [undefined, '', null, 'https://example.com/other']) {
+    assert.equal(identity({ ...manifest, id: value }).id.href, base);
+  }
+  assert.equal(identity({ ...manifest, id: '/-stamp-studio/#ignored' }).id.href, base);
 });
 test('192/512/maskable icons contain actual PNG data with declared dimensions', () => {
   for (const icon of manifest.icons) {
@@ -85,7 +117,7 @@ test('Failed install preserves active cache and reports error only to STAMP clie
 });
 test('Activation cleans only old STAMP caches; explicit message activates update', async () => {
   const sw = worker(); await sw.run('activate');
-  assert.deepEqual(sw.removed, ['stamp-studio-v1.0.0']);
+  assert.deepEqual(sw.removed, ['stamp-studio-v1.0.0', 'stamp-studio-v1.0.1']);
   await sw.run('message', { data: { type: 'SKIP_WAITING' } });
   assert.deepEqual(sw.messages, ['claim', 'skipWaiting']);
 });

@@ -59,7 +59,8 @@ class StudioTests(unittest.TestCase):
     def test_01_manifest_icons(self):
         m=self.page.evaluate('fetch("./manifest.json").then(r=>r.json())')
         self.assertEqual(m['name'],'STAMP STUDIO');self.assertEqual(m['short_name'],'STAMP')
-        for k in ['start_url','scope','id']:self.assertEqual(m[k],'./')
+        for k in ['start_url','scope']:self.assertEqual(m[k],'./')
+        self.assertEqual(m['id'],'/-stamp-studio/')
         self.assertEqual(m['display'],'standalone')
         self.assertEqual(m['theme_color'],'#111827');self.assertEqual(m['background_color'],'#111827')
         for i in m['icons']:
@@ -67,9 +68,9 @@ class StudioTests(unittest.TestCase):
                 s=int(i['sizes'].split('x')[0]);self.assertEqual(image.size,(s,s));self.assertEqual(image.format,'PNG')
         self.assertTrue(any(i['purpose']=='maskable' for i in m['icons']))
     def test_02_service_worker_subpath_cache(self):
-        result=self.page.evaluate('''async()=>{const r=await navigator.serviceWorker.ready;return {scope:r.scope,keys:await caches.keys(),assets:(await (await caches.open('stamp-studio-v1.0.1')).keys()).map(r=>r.url)};}''')
+        result=self.page.evaluate('''async()=>{const r=await navigator.serviceWorker.ready;return {scope:r.scope,keys:await caches.keys(),assets:(await (await caches.open('stamp-studio-v1.0.2')).keys()).map(r=>r.url)};}''')
         self.assertEqual(result['scope'],self.base)
-        self.assertIn('stamp-studio-v1.0.1',result['keys'])
+        self.assertIn('stamp-studio-v1.0.2',result['keys'])
         self.assertEqual(len(result['assets']),12)
         self.assertTrue(all(v.startswith(self.base) for v in result['assets']))
     def test_03_offline_reload_edit_zip(self):
@@ -183,12 +184,12 @@ class StudioTests(unittest.TestCase):
                 p.get_by_role('button',name='＋ 制作をはじめる').click()
                 p.get_by_label('プロジェクト名').fill('更新前の作品')
                 p.get_by_text('端末に保存済み',exact=True).wait_for()
-                sw=folder/'sw.js';sw.write_text(sw.read_text().replace('v1.0.1','v1.0.2'))
+                sw=folder/'sw.js';sw.write_text(sw.read_text().replace('v1.0.2','v1.0.3'))
                 p.evaluate('navigator.serviceWorker.getRegistration().then(r=>r.update())')
                 p.locator('#update').wait_for(state='visible')
-                self.assertIn('stamp-studio-v1.0.1',p.evaluate('caches.keys()'))
+                self.assertIn('stamp-studio-v1.0.2',p.evaluate('caches.keys()'))
                 p.get_by_role('button',name='保存して更新',exact=True).click()
-                p.wait_for_function("navigator.serviceWorker.controller && caches.keys().then(k=>k.includes('stamp-studio-v1.0.2')&&!k.includes('stamp-studio-v1.0.1'))")
+                p.wait_for_function("navigator.serviceWorker.controller && caches.keys().then(k=>k.includes('stamp-studio-v1.0.3')&&!k.includes('stamp-studio-v1.0.2'))")
                 p.get_by_label('プロジェクト名').wait_for();self.assertEqual(p.get_by_label('プロジェクト名').input_value(),'更新前の作品')
                 ctx.set_offline(True);p.reload();p.get_by_label('プロジェクト名').wait_for()
                 self.assertEqual(p.get_by_label('プロジェクト名').input_value(),'更新前の作品')

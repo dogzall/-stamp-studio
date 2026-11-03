@@ -1,4 +1,4 @@
-const VERSION = 'stamp-studio-v1.0.1';
+const VERSION = 'stamp-studio-v1.0.2';
 const PREFIX = 'stamp-studio-';
 const ASSETS = ['./', './index.html', './style.css', './app.js', './core.js', './db.js', './pwa.js', './manifest.json', './vendor/jszip.min.js', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png'];
 const manifestURL = new URL('./manifest.json', self.registration.scope).href;

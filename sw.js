@@ -1,6 +1,6 @@
-const VERSION = 'stamp-studio-v1.0.2';
+const VERSION = 'stamp-studio-v2.0.0';
 const PREFIX = 'stamp-studio-';
-const ASSETS = ['./', './index.html', './style.css', './app.js', './core.js', './db.js', './pwa.js', './manifest.json', './vendor/jszip.min.js', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png'];
+const ASSETS = ['./', './index.html', './style.css', './app.js', './core.js', './db.js', './pwa.js', './studio-v2.js', './planner-view.js', './workflow-view.js', './manifest.json', './vendor/jszip.min.js', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png'];
 const manifestURL = new URL('./manifest.json', self.registration.scope).href;
 
 self.addEventListener('install', event => event.waitUntil((async () => {

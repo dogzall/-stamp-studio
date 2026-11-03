@@ -116,7 +116,7 @@ export function renderPWAStatus(parent) {
   const details = document.createElement('pre');
   details.className = 'pwa-details';
   const refresh = () => {
-    state.textContent = `PWA修正版 1.0.2 / ${matchMedia('(display-mode: standalone)').matches ? 'アプリモード' : 'ブラウザモード'} / ${navigator.onLine ? 'オンライン' : 'オフライン'} / ${deferredPrompt ? 'インストール案内を表示できます' : 'インストール案内は未検出'}`;
+    state.textContent = `STAMP STUDIO Ver.2 / PWA 2.0.0 / ${matchMedia('(display-mode: standalone)').matches ? 'アプリモード' : 'ブラウザモード'} / ${navigator.onLine ? 'オンライン' : 'オフライン'} / ${deferredPrompt ? 'インストール案内を表示できます' : 'インストール案内は未検出'}`;
   };
   refresh();
   // Re-rendered settings screens must not accumulate listeners.
